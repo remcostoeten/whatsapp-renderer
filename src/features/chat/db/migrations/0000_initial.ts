@@ -8,8 +8,6 @@ export const chats = pgTable('chats', {
 	timestamp: timestamp('timestamp').defaultNow()
 })
 
-// Add other tables as needed...
-
 export async function up(db: DrizzleD1Database) {
 	await db.schema.createTable(chats)
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { LoaderWithText } from '@/components/loader'
+import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { getChatMessages } from '../../actions/get-chat-messages'
 
@@ -96,31 +98,28 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 									target="_blank" 
 									rel="noopener noreferrer"
 									className="text-sm text-blue-500 hover:underline mt-2 block"
-		<div className="flex flex-col gap-4 p-4">
-			{messages.map((message) => (
-				<div
-					key={message.id}
-					className="flex flex-col gap-1 p-4 rounded-lg bg-accent"
-				>
-					<div className="flex justify-between items-start">
-						<span className="font-medium">{message.name}</span>
-						<span className="text-xs text-muted-foreground">
-							{new Date(message.timestamp).toLocaleString()}
-						</span>
+								>
+									View Attachment
+								</a>
+							)}
+						</div>
 					</div>
-					<p className="text-sm">{message.message}</p>
-					{message.attachment && (
-						<a
-							href={message.attachment}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-sm text-blue-500 hover:underline"
-						>
-							View Attachment
-						</a>
-					)}
+				)
+			})}
+			
+			{hasMore && (
+				<div className="flex justify-center py-4">
+					<Button 
+						onClick={loadMore} 
+						disabled={isLoading}
+						variant="outline"
+					>
+						{isLoading ? 'Loading...' : 'Load More'}
+					</Button>
 				</div>
-			))}
+			)}
+			
+			{isLoading && <LoaderWithText text="Loading messages..." />}
 		</div>
 	)
 }

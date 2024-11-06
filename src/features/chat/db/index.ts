@@ -1,33 +1,13 @@
-import { neon, NeonQueryFunction, Pool } from '@neondatabase/serverless'
+import { neon, neonConfig } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 
-type DatabaseConfig = {
-	DATABASE_URL: string
-	SCHEMA: string
-	MESSAGES: string
-	FAVORITES: string
-}
+neonConfig.fetchConnectionCache = true
 
-const databaseConfig: DatabaseConfig = {
-	DATABASE_URL: process.env.DATABASE_URL || '',
-	SCHEMA: process.env.SCHEMA || '',
-	MESSAGES: process.env.MESSAGES || '',
-	FAVORITES: process.env.FAVORITES || ''
-}
+const DATABASE_URL = "postgresql://neondb_owner:JYvcF0Texq4K@ep-white-field-a2cj8raw.eu-central-1.aws.neon.tech/neondb?sslmode=require"
 
-let sql: NeonQueryFunction<boolean, boolean>
-let db: ReturnType<typeof drizzle>
-let pool: Pool
+const sql = neon(DATABASE_URL, { fullResults: true })
+export const db = drizzle(sql, {
+	logger: process.env.NODE_ENV === 'development'
+})
 
-if (typeof window === 'undefined') {
-	sql = neon(databaseConfig.DATABASE_URL)
-	db = drizzle(sql, {
-		schema: {
-			messages: databaseConfig.MESSAGES,
-			favorites: databaseConfig.FAVORITES
-		}
-	})
-	pool = new Pool({ connectionString: databaseConfig.DATABASE_URL })
-}
-
-export { db, pool, sql }
+export type DbClient = typeof db

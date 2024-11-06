@@ -1,4 +1,3 @@
-import { env } from '@/core/config/env.mjs'
 import type { Config } from 'drizzle-kit'
 
 export default {
@@ -6,6 +5,6 @@ export default {
 	out: './src/features/chat/db/migrations',
 	driver: 'pg',
 	dbCredentials: {
-		connectionString: env.DATABASE_URL
+		connectionString: "postgresql://neondb_owner:JYvcF0Texq4K@ep-white-field-a2cj8raw.eu-central-1.aws.neon.tech/neondb?sslmode=require"
 	}
 } satisfies Config

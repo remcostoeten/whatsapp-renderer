@@ -9,15 +9,13 @@ export default async function ChatsPage() {
 
 	return (
 		<div className="h-full flex flex-col">
-			<Suspense
-				fallback={
-					<div className="space-y-2">
-						{Array.from({ length: 5 }).map((_, i) => (
-							<ChatSkeleton key={i} />
-						))}
-					</div>
-				}
-			>
+			<Suspense fallback={
+				<div className="space-y-2">
+					{Array.from({ length: 5 }).map((_, i) => (
+						<ChatSkeleton key={i} />
+					))}
+				</div>
+			}>
 				{chats.length > 0 ? (
 					<ChatList initialChats={chats} />
 				) : (
