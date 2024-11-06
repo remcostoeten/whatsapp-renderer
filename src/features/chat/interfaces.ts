@@ -12,31 +12,44 @@ export interface ChatMessagesResponse {
 }
 
 export interface ChatStatistics {
-	overview: {
-		messageCount: number
-		participantCount: number
-		durationDays: number
-		avgMessagesPerDay: number
-		firstMessageDate: string
-		lastMessageDate: string
+	overview?: {
+		messageCount?: number
+		participantCount?: number
+		durationDays?: number
+		avgMessagesPerDay?: number
+		firstMessageDate?: string
+		lastMessageDate?: string
 	}
-	activity: {
-		hourlyActivity: { hour: number; count: number }[]
-		mostActiveHour: number
-		mostActiveDay: string
+	activity?: {
+		hourlyActivity?: { hour: number; count: number }[]
+		mostActiveHour?: number
+		mostActiveDay?: string
 	}
-	participants: {
-		name: string
-		messageCount: number
-		avgMessageLength: number
-		longestMessage: number
-		shortestMessage: number
+	participants?: {
+		name?: string
+		messageCount?: number
+		avgMessageLength?: number
+		longestMessage?: number
+		shortestMessage?: number
 	}[]
-	content: {
-		avgMessageLength: number
-		totalCharacters: number
-		attachmentCount: number
-		shortMessages: number
-		longMessages: number
+	content?: {
+		avgMessageLength?: number
+		totalCharacters?: number
+		attachmentCount?: number
+		shortMessages?: number
+		longMessages?: number
 	}
+}
+
+export interface ChatMessage {
+	id: string
+	chatId: string
+	sender: string
+	content: string
+	timestamp: string
+}
+
+export interface GetChatMessagesResult {
+	messages: ChatMessage[]
+	totalCount: number
 }

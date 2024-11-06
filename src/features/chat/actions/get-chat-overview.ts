@@ -1,4 +1,4 @@
-import { sql, desc } from 'drizzle-orm'
+import { desc, sql } from 'drizzle-orm'
 import { db } from '../db'
 import { messages } from '../db/schema'
 

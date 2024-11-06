@@ -1,4 +1,4 @@
-import { sql, desc } from 'drizzle-orm'
+import { desc, sql } from 'drizzle-orm'
 import { db } from '../db'
 import { messages } from '../db/schema'
 
@@ -21,6 +21,6 @@ export async function searchMessages(chatId: string, query: string) {
 		id: result.id,
 		index: result.messageIndex,
 		message: result.message,
-		timestamp: result.timestamp?.toISOString()
+		timestamp: result.timestamp?.toString()
 	}))
 }

@@ -1,23 +1,15 @@
-import { eq, desc, sql } from 'drizzle-orm'
+'use server'
+
+import { desc, eq } from 'drizzle-orm'
 import { db } from '../db'
 import { messages } from '../db/schema'
 
-export async function getChatMessages(
-	chatId: string,
-	page: number,
-	pageSize: number
-) {
-	try {
-		// Validate input parameters
-		const validatedPage = Math.max(1, Number(page) || 1)
-		const validatedPageSize = Math.max(
-			1,
-			Math.min(100, Number(pageSize) || 30)
-		)
-		const offset = (validatedPage - 1) * validatedPageSize
+export async function getChatMessages(chatId: string, page = 1, pageSize = 50) {
+	console.log('Fetching messages for chat:', chatId)
 
-		// Get messages for current page
-		const messagesResult = await db
+	try {
+		const offset = (page - 1) * pageSize
+		const results = await db
 			.select({
 				id: messages.id,
 				name: messages.name,
@@ -28,18 +20,14 @@ export async function getChatMessages(
 			.from(messages)
 			.where(eq(messages.chatId, chatId))
 			.orderBy(desc(messages.timestamp))
-			.limit(validatedPageSize)
+			.limit(pageSize)
 			.offset(offset)
 
-		// Get total count
-		const totalCount = await db
-			.select({ count: sql<number>`count(*)` })
-			.from(messages)
-			.where(eq(messages.chatId, chatId))
+		console.log('Found messages:', results.length)
 
 		return {
-			messages: messagesResult,
-			totalCount: Number(totalCount[0]?.count || 0)
+			messages: results,
+			totalCount: results.length
 		}
 	} catch (error) {
 		console.error('Error in getChatMessages:', error)

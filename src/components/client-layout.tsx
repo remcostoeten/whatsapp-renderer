@@ -1,10 +1,9 @@
 'use client'
 
+import TopNavigation from '@/components/top-navigation'
 import { useSidebarStore } from '@/features/store/use-sidebar-store'
 import type { ReactNode } from 'react'
 import Sidebar from './sidebar'
-import TopNavigation from './top-navigation'
-
 type ClientSideLayoutProps = {
 	children: ReactNode
 }
