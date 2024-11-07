@@ -1,9 +1,10 @@
 'use client'
 
 import TopNavigation from '@/components/top-navigation'
-import { useSidebarStore } from '@/features/store/use-sidebar-store'
+import { useSidebarStore } from '@/features/store/sidebar-store'
 import type { ReactNode } from 'react'
 import Sidebar from './sidebar'
+
 type ClientSideLayoutProps = {
 	children: ReactNode
 }
@@ -13,14 +14,11 @@ export default function ClientSideLayout({ children }: ClientSideLayoutProps) {
 
 	return (
 		<div className="flex h-screen">
-			<aside
-				className={`${
-					!isCollapsed ? 'w-64 opacity-100' : 'w-0 opacity-0'
-				} transition-all duration-300 overflow-hidden`}
-			>
-				<Sidebar />
-			</aside>
-			<div className="flex-1 flex flex-col">
+			<Sidebar />
+			<div className={cn(
+				'flex-1 flex flex-col transition-all duration-300',
+				isCollapsed ? 'ml-16' : 'ml-64'
+			)}>
 				<TopNavigation />
 				<main className="flex-1 overflow-hidden">{children}</main>
 			</div>

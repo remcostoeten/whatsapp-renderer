@@ -4,7 +4,7 @@ import { LoaderWithText } from '@/components/loader'
 import PaginationToolbar from '@/components/ui/pagination-toolbar'
 import { useSettingsStore } from '@/features/store/settings-store'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getChatMessages } from '../../actions/get-chat-messages'
 
 type Message = {
@@ -24,6 +24,8 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [totalMessages, setTotalMessages] = useState(0)
+	const messagesContainerRef = useRef<HTMLDivElement>(null)
+	const prevScrollHeightRef = useRef<number>(0)
 
 	const router = useRouter()
 	const pathname = usePathname()
@@ -49,6 +51,13 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 		router.push(`${pathname}?${params.toString()}`)
 	}
 
+	// Save scroll position before loading new messages
+	useEffect(() => {
+		if (messagesContainerRef.current) {
+			prevScrollHeightRef.current = messagesContainerRef.current.scrollHeight
+		}
+	}, [page])
+
 	useEffect(() => {
 		if (chatId) {
 			loadMessages()
@@ -61,6 +70,15 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 			updateUrl(page, pageSize)
 		}
 	}, [])
+
+	// Restore scroll position after loading new messages
+	useEffect(() => {
+		if (messagesContainerRef.current && prevScrollHeightRef.current) {
+			const newScrollHeight = messagesContainerRef.current.scrollHeight
+			const scrollDiff = newScrollHeight - prevScrollHeightRef.current
+			messagesContainerRef.current.scrollTop = scrollDiff
+		}
+	}, [messages])
 
 	async function loadMessages() {
 		try {
@@ -104,7 +122,10 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="flex-1 overflow-y-auto p-4">
+			<div 
+				ref={messagesContainerRef}
+				className="flex-1 overflow-y-auto p-4 flex flex-col"
+			>
 				{!messages.length && !isLoading ? (
 					<div className="text-muted-foreground">
 						No messages found

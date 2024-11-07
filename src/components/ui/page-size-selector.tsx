@@ -1,11 +1,11 @@
 'use client'
 
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
 } from '@/components/ui/select'
 
 type PageSizeSelectorProps = {
@@ -29,7 +29,10 @@ export default function PageSizeSelector({
 	}
 
 	return (
-		<Select value={value} onValueChange={handleValueChange}>
+		<Select
+			value={value}
+			onValueChange={handleValueChange}
+		>
 			<SelectTrigger className="w-[180px]">
 				<SelectValue placeholder={`${value} items per page`} />
 			</SelectTrigger>

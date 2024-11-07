@@ -39,7 +39,7 @@ export default function Pagination({
 	// Generate page numbers to display
 	const getPageNumbers = () => {
 		const pages = []
-		const maxVisible = 5 // Maximum number of visible page buttons
+		const maxVisible = 3 // Reduced from 5 to 3 visible page buttons
 
 		if (total <= maxVisible) {
 			// Show all pages if total is less than maxVisible
@@ -76,19 +76,20 @@ export default function Pagination({
 	}
 
 	return (
-		<div className={cn('flex items-center gap-2', className)}>
+		<div className={cn('flex items-center gap-1', className)}>
 			<Button
 				onClick={() => onPageChange(current - 1)}
 				disabled={current <= 1 || isLoading}
-				className="h-8 w-8 p-0"
+				className="h-7 w-7 p-0"
+				variant="ghost"
 			>
 				<ChevronLeft className="h-4 w-4" />
 			</Button>
 
-			<div className="flex items-center gap-1">
+			<div className="flex items-center gap-0.5">
 				{getPageNumbers().map((page, index) =>
 					page < 0 ? (
-						<span key={index} className="px-2">
+						<span key={index} className="px-1 text-sm text-muted-foreground">
 							...
 						</span>
 					) : (
@@ -96,8 +97,9 @@ export default function Pagination({
 							key={index}
 							onClick={() => onPageChange(page)}
 							disabled={isLoading || page === current}
+							variant={page === current ? "default" : "ghost"}
 							className={cn(
-								'h-8 min-w-[2rem] px-3',
+								'h-7 min-w-[1.75rem] px-2 text-sm',
 								page === current &&
 									'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground'
 							)}
@@ -111,12 +113,13 @@ export default function Pagination({
 			<Button
 				onClick={() => onPageChange(current + 1)}
 				disabled={current >= total || isLoading}
-				className="h-8 w-8 p-0"
+				className="h-7 w-7 p-0"
+				variant="ghost"
 			>
 				<ChevronRight className="h-4 w-4" />
 			</Button>
 
-			<form onSubmit={handleJumpToPage} className="flex items-center gap-2 ml-4">
+			<form onSubmit={handleJumpToPage} className="flex items-center gap-1 ml-2">
 				<Input
 					type="number"
 					min={1}
@@ -124,13 +127,13 @@ export default function Pagination({
 					value={jumpToPage}
 					onChange={(e) => setJumpToPage(e.target.value)}
 					placeholder="Page"
-					className="h-8 w-16 text-center"
+					className="h-7 w-14 text-center text-sm px-1"
 				/>
 				<Button 
 					type="submit"
 					disabled={isLoading}
-					className="h-8"
-					variant="outline"
+					className="h-7 px-2 text-sm"
+					variant="ghost"
 				>
 					Go
 				</Button>
