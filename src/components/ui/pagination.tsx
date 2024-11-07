@@ -1,8 +1,10 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
 
 type PaginationProps = {
 	currentPage: number
@@ -19,9 +21,20 @@ export default function Pagination({
 	isLoading,
 	className
 }: PaginationProps) {
+	const [jumpToPage, setJumpToPage] = useState('')
+	
 	// Ensure we have valid numbers
 	const current = Math.max(1, currentPage)
 	const total = Math.max(1, totalPages || 1)
+
+	const handleJumpToPage = (e: React.FormEvent) => {
+		e.preventDefault()
+		const pageNumber = Number(jumpToPage)
+		if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= total) {
+			onPageChange(pageNumber)
+			setJumpToPage('')
+		}
+	}
 
 	// Generate page numbers to display
 	const getPageNumbers = () => {
@@ -102,6 +115,26 @@ export default function Pagination({
 			>
 				<ChevronRight className="h-4 w-4" />
 			</Button>
+
+			<form onSubmit={handleJumpToPage} className="flex items-center gap-2 ml-4">
+				<Input
+					type="number"
+					min={1}
+					max={total}
+					value={jumpToPage}
+					onChange={(e) => setJumpToPage(e.target.value)}
+					placeholder="Page"
+					className="h-8 w-16 text-center"
+				/>
+				<Button 
+					type="submit"
+					disabled={isLoading}
+					className="h-8"
+					variant="outline"
+				>
+					Go
+				</Button>
+			</form>
 		</div>
 	)
 }

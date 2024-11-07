@@ -27,7 +27,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 		<html
 			lang="en"
 			suppressHydrationWarning
-			className={`dark ${geistSans.variable} ${geistMono.variable}`}
+			className={`dark theme-custom${geistSans.variable} ${geistMono.variable}`}
 		>
 			<body className="min-h-screen bg-background text-foreground">
 				<ThemeProvider
