@@ -4,10 +4,10 @@ import { persist } from 'zustand/middleware'
 type SettingsStore = {
 	defaultCollapsed: boolean
 	useInfiniteScroll: boolean
-	defaultPageSize: number
+	pageSize: number
 	setDefaultCollapsed: (collapsed: boolean) => void
 	setUseInfiniteScroll: (useInfinite: boolean) => void
-	setDefaultPageSize: (size: number) => void
+	setPageSize: (size: number) => void
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -15,12 +15,12 @@ export const useSettingsStore = create<SettingsStore>()(
 		(set) => ({
 			defaultCollapsed: false,
 			useInfiniteScroll: false,
-			defaultPageSize: 30,
+			pageSize: 25,
 			setDefaultCollapsed: (collapsed) =>
 				set({ defaultCollapsed: collapsed }),
 			setUseInfiniteScroll: (useInfinite) =>
 				set({ useInfiniteScroll: useInfinite }),
-			setDefaultPageSize: (size) => set({ defaultPageSize: size })
+			setPageSize: (size) => set({ pageSize: size })
 		}),
 		{
 			name: 'chat-settings'

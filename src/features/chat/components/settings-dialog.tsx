@@ -1,34 +1,32 @@
 'use client'
 
 import {
-	Select,
-	Dialog,
-	Button,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-	Switch,
-	Label
+    Button,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    Label,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    Switch
 } from '@/components/ui/'
 import { useSettingsStore } from '@/features/store/settings-store'
 import { Settings } from 'lucide-react'
 
-const pageSizeOptions = [10, 25, 50, 75, 100]
+const pageSizeOptions = [10, 25, 50, 75, 100] as const
 
 export default function SettingsDialog() {
-	const {
-		defaultCollapsed,
-		useInfiniteScroll,
-		defaultPageSize,
-		setDefaultCollapsed,
-		setUseInfiniteScroll,
-		setDefaultPageSize
-	} = useSettingsStore()
+	const pageSize = useSettingsStore((state) => state.pageSize)
+	const setPageSize = useSettingsStore((state) => state.setPageSize)
+	const useInfiniteScroll = useSettingsStore((state) => state.useInfiniteScroll)
+	const setUseInfiniteScroll = useSettingsStore((state) => state.setUseInfiniteScroll)
+	const defaultCollapsed = useSettingsStore((state) => state.defaultCollapsed)
+	const setDefaultCollapsed = useSettingsStore((state) => state.setDefaultCollapsed)
 
 	return (
 		<Dialog>
@@ -37,20 +35,33 @@ export default function SettingsDialog() {
 					<Settings className="h-5 w-5" />
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Settings</DialogTitle>
 				</DialogHeader>
-				<div className="grid gap-4 py-4">
-					<div className="flex items-center justify-between">
-						<Label htmlFor="sidebar-collapsed">
-							Sidebar Collapsed by Default
-						</Label>
-						<Switch
-							id="sidebar-collapsed"
-							checked={defaultCollapsed}
-							onCheckedChange={setDefaultCollapsed}
-						/>
+				<div className="space-y-6">
+					<div className="space-y-2">
+						<Label htmlFor="page-size">Page Size</Label>
+						<Select
+							value={String(pageSize)}
+							onValueChange={(value) =>
+								setPageSize(Number(value))
+							}
+						>
+							<SelectTrigger>
+								<SelectValue placeholder="Select page size" />
+							</SelectTrigger>
+							<SelectContent>
+								{pageSizeOptions.map((size) => (
+									<SelectItem
+										key={size}
+										value={String(size)}
+									>
+										{size} messages per page
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 
 					<div className="flex items-center justify-between">
@@ -65,27 +76,14 @@ export default function SettingsDialog() {
 					</div>
 
 					<div className="flex items-center justify-between">
-						<Label htmlFor="page-size">Default Page Size</Label>
-						<Select
-							value={defaultPageSize.toString()}
-							onValueChange={(value) =>
-								setDefaultPageSize(Number(value))
-							}
-						>
-							<SelectTrigger className="w-[100px]">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{pageSizeOptions.map((size) => (
-									<SelectItem
-										key={size}
-										value={size.toString()}
-									>
-										{size}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<Label htmlFor="default-collapsed">
+							Sidebar Collapsed by Default
+						</Label>
+						<Switch
+							id="default-collapsed"
+							checked={defaultCollapsed}
+							onCheckedChange={setDefaultCollapsed}
+						/>
 					</div>
 				</div>
 			</DialogContent>
