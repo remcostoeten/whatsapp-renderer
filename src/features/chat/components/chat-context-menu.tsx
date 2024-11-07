@@ -28,7 +28,7 @@ export default function ChatContextMenu({
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-			<ContextMenuContent className="w-64">
+			<ContextMenuContent className="w-16">
 				<ContextMenuItem onClick={onViewInfo}>
 					<Info className="mr-2 h-4 w-4" />
 					View Info

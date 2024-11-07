@@ -1,29 +1,35 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+"use client"
+
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
+
+export type SortOrder = 'asc' | 'desc'
 
 type SettingsStore = {
-	defaultCollapsed: boolean
-	useInfiniteScroll: boolean
-	pageSize: number
-	setDefaultCollapsed: (collapsed: boolean) => void
-	setUseInfiniteScroll: (useInfinite: boolean) => void
-	setPageSize: (size: number) => void
+	messagesPerPage: number
+	sortOrder: SortOrder
+	setMessagesPerPage: (count: number) => void
+	setSortOrder: (order: SortOrder) => void
+	toggleRightSidebar: () => void
+	isRightSidebarOpen: boolean
 }
 
 export const useSettingsStore = create<SettingsStore>()(
 	persist(
 		(set) => ({
-			defaultCollapsed: false,
-			useInfiniteScroll: false,
-			pageSize: 25,
-			setDefaultCollapsed: (collapsed) =>
-				set({ defaultCollapsed: collapsed }),
-			setUseInfiniteScroll: (useInfinite) =>
-				set({ useInfiniteScroll: useInfinite }),
-			setPageSize: (size) => set({ pageSize: size })
+			messagesPerPage: 25,
+			sortOrder: 'desc',
+			isRightSidebarOpen: false,
+			setMessagesPerPage: (count: number) => {
+				set({ messagesPerPage: count })
+			},
+			setSortOrder: (order: SortOrder) => {
+				set({ sortOrder: order })
+			},
+			toggleRightSidebar: () => set((state) => ({ isRightSidebarOpen: !state.isRightSidebarOpen })),
 		}),
 		{
-			name: 'chat-settings'
+			name: "settings-storage",
 		}
 	)
 )

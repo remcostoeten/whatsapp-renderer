@@ -18,7 +18,7 @@ export async function getChatMessages(chatId: string, page = 1, pageSize = 50) {
 
 		const totalCount = Number(countResult[0].count)
 
-		// Then get paginated results
+		// Then get paginated results - always newest first
 		const offset = (page - 1) * pageSize
 		const results = await db
 			.select({
@@ -30,7 +30,7 @@ export async function getChatMessages(chatId: string, page = 1, pageSize = 50) {
 			})
 			.from(messages)
 			.where(eq(messages.chatId, chatId))
-			.orderBy(desc(messages.timestamp))
+			.orderBy(desc(messages.timestamp)) // Always newest first
 			.limit(pageSize)
 			.offset(offset)
 
