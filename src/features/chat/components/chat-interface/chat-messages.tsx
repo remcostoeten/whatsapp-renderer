@@ -26,26 +26,22 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 	const [totalMessages, setTotalMessages] = useState(0)
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const prevScrollHeightRef = useRef<number>(0)
+	const isInitialLoadRef = useRef(true)
 
 	const router = useRouter()
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
+	const { messagesPerPage, sortOrder } = useSettingsStore()
 
-	// Get page and pageSize from URL or defaults
 	const pageFromUrl = Number(searchParams.get('page')) || 1
-	const pageSizeFromUrl =
-		Number(searchParams.get('pageSize')) ||
-		useSettingsStore.getState().pageSize
+	const pageSizeFromUrl = Number(searchParams.get('pageSize')) || messagesPerPage
 
 	const [page, setPage] = useState(pageFromUrl)
-	const pageSize = useSettingsStore((state) => state.pageSize)
-	const setPageSize = useSettingsStore((state) => state.setPageSize)
 
-	const totalPages = Math.max(1, Math.ceil(totalMessages / pageSize))
+	const totalPages = Math.max(1, Math.ceil(totalMessages / messagesPerPage))
 
-	// Update URL when page or pageSize changes
-	const updateUrl = (newPage: number, newPageSize: number) => {
-		const params = new URLSearchParams(searchParams)
+	const updateUrl = (newPage: number, newPageSize: number = messagesPerPage) => {
+		const params = new URLSearchParams(searchParams.toString())
 		params.set('page', newPage.toString())
 		params.set('pageSize', newPageSize.toString())
 		router.push(`${pathname}?${params.toString()}`)
@@ -53,7 +49,7 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 
 	// Save scroll position before loading new messages
 	useEffect(() => {
-		if (messagesContainerRef.current) {
+		if (!isInitialLoadRef.current && messagesContainerRef.current) {
 			prevScrollHeightRef.current = messagesContainerRef.current.scrollHeight
 		}
 	}, [page])
@@ -62,18 +58,21 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 		if (chatId) {
 			loadMessages()
 		}
-	}, [chatId, page, pageSize])
+	}, [chatId, page, messagesPerPage, sortOrder])
 
 	// Sync URL with state on mount
 	useEffect(() => {
-		if (pageFromUrl !== page || pageSizeFromUrl !== pageSize) {
-			updateUrl(page, pageSize)
+		if (pageFromUrl !== page || pageSizeFromUrl !== messagesPerPage) {
+			updateUrl(page, messagesPerPage)
 		}
 	}, [])
 
-	// Restore scroll position after loading new messages
+	// Handle scroll position after loading messages
 	useEffect(() => {
-		if (messagesContainerRef.current && prevScrollHeightRef.current) {
+		if (!messagesContainerRef.current) return
+
+		// Always maintain scroll position for consistency
+		if (prevScrollHeightRef.current) {
 			const newScrollHeight = messagesContainerRef.current.scrollHeight
 			const scrollDiff = newScrollHeight - prevScrollHeightRef.current
 			messagesContainerRef.current.scrollTop = scrollDiff
@@ -83,7 +82,7 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 	async function loadMessages() {
 		try {
 			setIsLoading(true)
-			const response = await getChatMessages(chatId, page, pageSize)
+			const response = await getChatMessages(chatId, page, messagesPerPage)
 
 			const formattedMessages = response.messages.map((msg) => ({
 				...msg,
@@ -91,7 +90,12 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 				attachment: msg.attachment || null
 			}))
 
-			setMessages(formattedMessages)
+			const sortedMessages = [...formattedMessages].sort((a, b) => {
+				const comparison = a.timestamp.getTime() - b.timestamp.getTime()
+				return sortOrder === 'asc' ? comparison : -comparison
+			})
+
+			setMessages(sortedMessages)
 			setTotalMessages(response.totalCount)
 		} catch (err) {
 			console.error('Error loading messages:', err)
@@ -104,16 +108,15 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 	const handlePageChange = (newPage: number) => {
 		if (newPage !== page && newPage > 0 && newPage <= totalPages) {
 			setPage(newPage)
-			updateUrl(newPage, pageSize)
+			updateUrl(newPage, messagesPerPage)
 		}
 	}
 
 	const handlePageSizeChange = (newSize: number) => {
-		if (setPageSize && newSize !== pageSize) {
-			setPageSize(newSize)
-			setPage(1)
-			updateUrl(1, newSize)
-		}
+		setMessagesPerPage(newSize)
+		setPage(1)
+		isInitialLoadRef.current = true
+		updateUrl(1, newSize)
 	}
 
 	if (error) {
@@ -176,7 +179,7 @@ export function ChatMessages({ chatId }: ChatMessagesProps) {
 				<PaginationToolbar
 					currentPage={page}
 					totalPages={totalPages}
-					pageSize={pageSize}
+					pageSize={messagesPerPage}
 					onPageChange={handlePageChange}
 					onPageSizeChange={handlePageSizeChange}
 					isLoading={isLoading}

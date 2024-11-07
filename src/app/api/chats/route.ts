@@ -1,15 +1,16 @@
 import { db } from '@/features/chat/db'
 import { messages } from '@/features/chat/db/schema'
-import { desc } from 'drizzle-orm'
+import { desc, sql } from 'drizzle-orm'
 
 export async function GET() {
 	try {
-		// Get all chats with their latest messages
+		// Get all chats with their latest messages and message count
 		const chats = await db
 			.select({
 				id: messages.chatId,
 				lastMessage: messages.message,
-				timestamp: messages.timestamp
+				timestamp: messages.timestamp,
+				messageCount: sql<number>`count(*) OVER (PARTITION BY ${messages.chatId})`
 			})
 			.from(messages)
 			.orderBy(desc(messages.timestamp))

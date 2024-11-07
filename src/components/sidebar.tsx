@@ -1,32 +1,34 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSidebarStore } from '@/features/store/sidebar-store'
 import { cn } from '@/lib/utils'
 import {
 	MessageCircle,
 	PanelLeftClose,
-	PanelLeftOpen,
-	Search
+	PanelLeftOpen
 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 type Chat = {
 	id: string
 	lastMessage: string | null
 	timestamp: string | null
+	messageCount: number
+	name: string
 }
 
 export default function Sidebar() {
-	const [searchQuery, setSearchQuery] = useState('')
 	const [chats, setChats] = useState<Chat[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const pathname = usePathname()
+	const searchParams = useSearchParams()
 	const { isCollapsed, toggleSidebar } = useSidebarStore()
+	const searchQuery = searchParams.get('q') || ''
 
 	useEffect(() => {
 		const fetchChats = async () => {
@@ -36,6 +38,7 @@ export default function Sidebar() {
 				setChats(data)
 			} catch (error) {
 				console.error('Failed to fetch chats:', error)
+				toast.error('Failed to load chats')
 			} finally {
 				setIsLoading(false)
 			}
@@ -44,9 +47,24 @@ export default function Sidebar() {
 		fetchChats()
 	}, [])
 
+	const handleSidebarToggle = () => {
+		toggleSidebar()
+		toast.success(
+			isCollapsed ? 'Sidebar expanded' : 'Sidebar collapsed',
+			{
+				position: 'bottom-right',
+				duration: 2000,
+			}
+		)
+	}
+
 	const filteredChats = chats.filter((chat) =>
 		chat.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
 	)
+
+	const sortedChats = useMemo(() => {
+		return [...filteredChats].sort((a, b) => b.messageCount - a.messageCount)
+	}, [filteredChats])
 
 	return (
 		<div className="relative">
@@ -56,12 +74,12 @@ export default function Sidebar() {
 					isCollapsed ? 'w-16' : 'w-64'
 				)}
 			>
-				<div className="flex h-14 items-center border-b px-3">
+				<div className="flex h-12 items-center border-b px-3">
 					<Button
 						variant="ghost"
 						size="icon"
 						className="ml-auto"
-						onClick={toggleSidebar}
+						onClick={handleSidebarToggle}
 					>
 						{isCollapsed ? (
 							<PanelLeftOpen className="h-4 w-4" />
@@ -70,20 +88,6 @@ export default function Sidebar() {
 						)}
 					</Button>
 				</div>
-
-				{!isCollapsed && (
-					<div className="p-4">
-						<div className="relative">
-							<Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-							<Input
-								placeholder="Search chats..."
-								className="pl-8"
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-							/>
-						</div>
-					</div>
-				)}
 
 				<ScrollArea className="flex-1">
 					<div className="space-y-2 p-2">
@@ -105,12 +109,12 @@ export default function Sidebar() {
 									</div>
 								))}
 							</div>
-						) : filteredChats.length === 0 ? (
+						) : sortedChats.length === 0 ? (
 							<div className="p-4 text-center text-muted-foreground">
 								No chats found
 							</div>
 						) : (
-							filteredChats.map((chat) => (
+							sortedChats.map((chat) => (
 								<Link
 									key={chat.id}
 									href={`/chats/${chat.id}`}
@@ -120,17 +124,31 @@ export default function Sidebar() {
 											'bg-accent text-accent-foreground'
 									)}
 								>
-									<div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
+									<div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
 										<MessageCircle className="h-4 w-4" />
+										{chat.messageCount > 0 && (
+											<div className={cn(
+												"absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground",
+												chat.messageCount > 999 ? "h-5 w-auto px-1 -right-3" : "h-4 w-4"
+											)}>
+												{chat.messageCount > 999 
+													? `${Math.floor(chat.messageCount/1000)}k`
+													: chat.messageCount}
+											</div>
+										)}
 									</div>
 									{!isCollapsed && (
 										<div className="flex-1 truncate">
-											<div className="text-sm font-medium">
-												Chat {chat.id}
+											<div className="flex items-center justify-between">
+												<span className="text-sm font-medium">
+													Chat {chat.id}
+												</span>
+												<span className="text-xs text-muted-foreground">
+													{chat.timestamp ? new Date(chat.timestamp).toLocaleDateString() : ''}
+												</span>
 											</div>
 											<div className="text-xs text-muted-foreground truncate">
-												{chat.lastMessage ||
-													'No messages'}
+												{chat.lastMessage || 'No messages'}
 											</div>
 										</div>
 									)}
