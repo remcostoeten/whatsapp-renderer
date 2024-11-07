@@ -16,7 +16,9 @@ export default function ChatPage({ params }: PageProps) {
 				<SearchBar chatId={params.id} />
 			</div>
 			<div className="flex-1 overflow-y-auto">
-				<Suspense fallback={<LoaderWithText text="Loading messages..." />}>
+				<Suspense
+					fallback={<LoaderWithText text="Loading messages..." />}
+				>
 					<ChatMessages chatId={params.id} />
 				</Suspense>
 			</div>

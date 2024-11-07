@@ -1,19 +1,19 @@
 'use client'
 
 import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    Switch
+	Button,
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+	Label,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+	Switch
 } from '@/components/ui/'
 import { useSettingsStore } from '@/features/store/settings-store'
 import { Settings } from 'lucide-react'
@@ -23,10 +23,16 @@ const pageSizeOptions = [10, 25, 50, 75, 100] as const
 export default function SettingsDialog() {
 	const pageSize = useSettingsStore((state) => state.pageSize)
 	const setPageSize = useSettingsStore((state) => state.setPageSize)
-	const useInfiniteScroll = useSettingsStore((state) => state.useInfiniteScroll)
-	const setUseInfiniteScroll = useSettingsStore((state) => state.setUseInfiniteScroll)
+	const useInfiniteScroll = useSettingsStore(
+		(state) => state.useInfiniteScroll
+	)
+	const setUseInfiniteScroll = useSettingsStore(
+		(state) => state.setUseInfiniteScroll
+	)
 	const defaultCollapsed = useSettingsStore((state) => state.defaultCollapsed)
-	const setDefaultCollapsed = useSettingsStore((state) => state.setDefaultCollapsed)
+	const setDefaultCollapsed = useSettingsStore(
+		(state) => state.setDefaultCollapsed
+	)
 
 	return (
 		<Dialog>
@@ -53,10 +59,7 @@ export default function SettingsDialog() {
 							</SelectTrigger>
 							<SelectContent>
 								{pageSizeOptions.map((size) => (
-									<SelectItem
-										key={size}
-										value={String(size)}
-									>
+									<SelectItem key={size} value={String(size)}>
 										{size} messages per page
 									</SelectItem>
 								))}

@@ -5,6 +5,7 @@ export default {
 	out: './src/features/chat/db/migrations',
 	driver: 'pg',
 	dbCredentials: {
-		connectionString: "postgresql://neondb_owner:JYvcF0Texq4K@ep-white-field-a2cj8raw.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+		connectionString:
+			'postgresql://neondb_owner:JYvcF0Texq4K@ep-white-field-a2cj8raw.eu-central-1.aws.neon.tech/neondb?sslmode=require'
 	}
 } satisfies Config
